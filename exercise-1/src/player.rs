@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::sight::Sighted;
+use crate::sight::Visible;
 
 #[derive(Component)]
 pub struct Player;
@@ -19,10 +19,7 @@ fn setup(mut commands: Commands) {
         .insert(crate::movement::Direction { value: Vec2::ZERO })
         .insert(crate::controls::Controlled)
         .insert(Player)
-        .insert(Sighted {
-            fov: (60.0 / 360.0) * std::f32::consts::TAU,
-            distance: 50.0,
-        });
+        .insert(Visible);
 }
 
 pub struct PlayerPlugin;
