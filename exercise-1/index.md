@@ -2,6 +2,13 @@
 
 Symmetric visibility test with occlusion via line segment intersections.
 
+There is a player (a blue square), an occluding wall (a black quadrilateral), and a non-player
+character (a grey square).
+When the player and NPC can't see each other, the NPC is coloured grey.
+When the player and NPC *can* see each other, the NPC is coloured green.
+
+## Mechanics
+
 An occluder, such as a wall, consists of four lines forming a quadrilateral.
 To check whether an entity `a` can see entity `b`, a line segment is created starting at `a` and
 ending at `b`.
@@ -10,7 +17,7 @@ line segment defined by an occluder.
 If there is an intersection, it means that the "line of sight" from `a` to `b` has been blocked by
 at least one side of the occluder.
 
-Issues:
+## Issues
 
 * The cost of a visibility check is proportional to the number of occluders.
 
@@ -30,3 +37,8 @@ Issues:
   The visibility check takes two entities as arguments.
   I can check whether `a` sees `b`, but it's harder to find out what `a` can see in general.
   I'd like to be able to do this so that an NPC's actions can be influenced by what they see.
+
+* Line of sight can be obscured by very small objects.
+
+  If there is a single pixel-sized occluder blocking the line segment between two entities that are
+  otherwise visible to each other, this system will report that they can't see each other.

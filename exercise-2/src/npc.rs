@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     controls, movement,
     player::Player,
-    sight::{CheckVisibility, Sighted},
+    sight::{CheckVisibility, Sighted, Visible},
 };
 
 #[derive(Component)]
@@ -14,6 +14,7 @@ pub struct NpcBundle {
     npc: Npc,
     sprite: SpriteBundle,
     sighted: Sighted,
+    visible: Visible,
 }
 
 impl NpcBundle {
@@ -29,6 +30,7 @@ impl NpcBundle {
                 ..default()
             },
             sighted: Sighted,
+            visible: Visible,
         }
     }
 
