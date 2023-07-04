@@ -1,6 +1,6 @@
 # `boxybox`
 
-Experiments with programming non-player characters ("AI") for games.
+A playground for various 2D video game techniques. 
 
 ## 1. Vision
 
