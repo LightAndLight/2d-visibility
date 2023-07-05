@@ -70,7 +70,7 @@ impl Occluder {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Segment(pub Vec3, pub Vec3);
 
 /*

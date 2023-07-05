@@ -9,3 +9,5 @@ Adds a visual representation of which areas are visible to the player character.
 
 * <https://ncase.me/sight-and-light/>
 * <https://slembcke.github.io/2D-Lighting-Overview>
+* Quadrilateral winding order: <https://stackoverflow.com/a/7009675/2884502>
+  * https://stackoverflow.com/a/69104076/2884502

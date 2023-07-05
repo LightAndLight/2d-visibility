@@ -6,3 +6,4 @@ A playground for various 2D video game techniques.
 
 * [`exercise-1/`](./exercise-1/index.md) - line segment intersections
 * [`exercise-2/`](./exercise-2/index.md) - hiding occluded objects
+* [`exercise-3/`](./exercise-2/index.md) - visually feedback for occluded areas
