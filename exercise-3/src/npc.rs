@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    controls, movement,
+    controls, light, movement,
     player::Player,
     sight::{CheckVisibility, Sighted, Visible},
 };
@@ -72,7 +72,8 @@ impl Plugin for NpcPlugin {
         app.configure_set(
             NpcSet
                 .before(controls::ControlsSet)
-                .after(movement::MovementSet),
+                .after(movement::MovementSet)
+                .after(light::LightSet),
         );
 
         app.add_system(see_player.in_set(NpcSet));

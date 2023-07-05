@@ -21,9 +21,20 @@ fn setup(mut commands: Commands) {
         ..default()
     });
 
+    commands.spawn(player::PlayerBundle::default());
     commands.spawn(npc::NpcBundle::default().with_transform(Transform::from_xyz(-100.0, 0.0, 0.0)));
     commands
         .spawn(wall::WallBundle::default().with_transform(Transform::from_xyz(-50.0, 0.0, 0.0)));
+    commands.spawn(
+        wall::WallBundle::default()
+            .with_transform(Transform::from_xyz(50.0, 40.0, 0.0))
+            .with_size(Vec2 { x: 10.0, y: 40.0 }),
+    );
+    commands.spawn(
+        wall::WallBundle::default()
+            .with_transform(Transform::from_xyz(50.0, -40.0, 0.0))
+            .with_size(Vec2 { x: 10.0, y: 40.0 }),
+    );
 }
 
 pub struct GamePlugin;

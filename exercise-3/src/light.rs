@@ -12,6 +12,9 @@ use crate::{
     sight::{Occluder, Segment},
 };
 
+/// Render shadow quad outlines and barycenters.
+pub const DEBUG: bool = false;
+
 #[derive(Component)]
 struct PlayerRay {
     occluder: Entity,
@@ -62,7 +65,7 @@ fn project_ray_to_window_edge(width: f32, height: f32, ray: Ray) -> f32 {
         (None, None) => unreachable!(),
         (None, Some(t)) => t,
         (Some(t), None) => t,
-        (Some(t_left_right), Some(t_top_bottom)) => f32::min(t_left_right, t_top_bottom),
+        (Some(t_left_right), Some(t_top_bottom)) => f32::max(t_left_right, t_top_bottom),
     };
 
     assert!(t >= 0.0);
@@ -121,10 +124,8 @@ impl From<Quad> for Mesh {
         let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
 
         let mut values = [value.0, value.1, value.2, value.3];
-        trace!("values: {values:?}");
 
         let barycentre = (value.0 + value.1 + value.2 + value.3) / 4.0;
-        trace!("barycentre: {barycentre:?}");
 
         values.sort_by(|a, b| angle_ccw(&barycentre, a).total_cmp(&angle_ccw(&barycentre, b)));
 
@@ -149,16 +150,19 @@ fn project_points_to_window_edge(
 }
 
 #[derive(Component)]
-struct PlayerOccluderShadow {
+struct PlayerShadow {
+    occluder: Entity,
+}
+
+#[derive(Component)]
+struct SegmentShadow {
     segment: Segment,
 }
 
 #[derive(Component)]
-struct PlayerOccluderShadowBarycentre {
-    segment: Segment,
-}
+struct ShadowBarycentre;
 
-fn add_player_rays(
+fn add_player_shadows(
     windows: Query<&Window>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -168,7 +172,6 @@ fn add_player_rays(
 ) {
     if !occluders.is_empty() {
         let window = windows.get_single().unwrap();
-        trace!("window: {:?}w x {:?}h", window.width(), window.height());
 
         let player_transform = player_query.get_single().unwrap();
 
@@ -176,6 +179,10 @@ fn add_player_rays(
         let material_dark_gray = materials.add(ColorMaterial::from(Color::DARK_GRAY));
 
         for (entity, occluder) in occluders.iter() {
+            let player_shadow_entity = commands
+                .spawn((PlayerShadow { occluder: entity }, SpatialBundle::default()))
+                .id();
+
             for segment in occluder.iter_segments() {
                 let ray_1_end = project_points_to_window_edge(
                     window.width(),
@@ -196,91 +203,101 @@ fn add_player_rays(
                 let v3 = ray_2_end;
                 let v4 = segment.1;
 
-                commands.spawn((
-                    PlayerOccluderShadow { segment },
-                    MaterialMesh2dBundle {
-                        mesh: meshes.add(Quad(v1, v2, v3, v4).into()).into(),
-                        material: material_dark_gray.clone(),
-                        ..default()
-                    },
-                ));
-
-                let barycentre = (v1 + v2 + v3 + v4) / 4.0;
-                commands.spawn((
-                    PlayerOccluderShadowBarycentre { segment },
-                    MaterialMesh2dBundle {
-                        mesh: meshes
-                            .add(
-                                shape::Circle {
-                                    radius: 5.0,
+                commands
+                    .entity(player_shadow_entity)
+                    .with_children(|parent| {
+                        parent
+                            .spawn((
+                                SegmentShadow { segment },
+                                MaterialMesh2dBundle {
+                                    mesh: meshes.add(Quad(v1, v2, v3, v4).into()).into(),
+                                    material: material_dark_gray.clone(),
                                     ..default()
+                                },
+                            ))
+                            .with_children(|parent| {
+                                if DEBUG {
+                                    parent.spawn((
+                                        ShadowBarycentre,
+                                        MaterialMesh2dBundle {
+                                            mesh: meshes
+                                                .add(
+                                                    shape::Circle {
+                                                        radius: 5.0,
+                                                        ..default()
+                                                    }
+                                                    .into(),
+                                                )
+                                                .into(),
+                                            material: material_red.clone(),
+                                            transform: Transform::from_translation(
+                                                (v1 + v2 + v3 + v4) / 4.0 + Vec3::Z,
+                                            ),
+                                            ..default()
+                                        },
+                                    ));
                                 }
-                                .into(),
-                            )
-                            .into(),
-                        material: material_red.clone(),
-                        transform: Transform::from_translation(barycentre + Vec3::Z),
-                        ..default()
-                    },
-                ));
+                            });
+                    });
 
-                commands.spawn((
-                    PlayerRay {
-                        occluder: entity,
-                        through: segment.0,
-                        end: ray_1_end,
-                    },
-                    MaterialMesh2dBundle {
-                        mesh: meshes
-                            .add(
-                                Line {
-                                    start: player_transform.translation,
-                                    end: ray_1_end,
-                                }
+                if DEBUG {
+                    commands.spawn((
+                        PlayerRay {
+                            occluder: entity,
+                            through: segment.0,
+                            end: ray_1_end,
+                        },
+                        MaterialMesh2dBundle {
+                            mesh: meshes
+                                .add(
+                                    Line {
+                                        start: player_transform.translation,
+                                        end: ray_1_end,
+                                    }
+                                    .into(),
+                                )
                                 .into(),
-                            )
-                            .into(),
-                        material: material_red.clone(),
-                        transform: Transform::from_translation(Vec3::Z),
-                        ..default()
-                    },
-                ));
-                commands.spawn((
-                    PlayerRay {
-                        occluder: entity,
-                        through: segment.1,
-                        end: ray_2_end,
-                    },
-                    MaterialMesh2dBundle {
-                        mesh: meshes
-                            .add(
-                                Line {
-                                    start: player_transform.translation,
-                                    end: ray_2_end,
-                                }
+                            material: material_red.clone(),
+                            transform: Transform::from_translation(Vec3::Z),
+                            ..default()
+                        },
+                    ));
+
+                    commands.spawn((
+                        PlayerRay {
+                            occluder: entity,
+                            through: segment.1,
+                            end: ray_2_end,
+                        },
+                        MaterialMesh2dBundle {
+                            mesh: meshes
+                                .add(
+                                    Line {
+                                        start: player_transform.translation,
+                                        end: ray_2_end,
+                                    }
+                                    .into(),
+                                )
                                 .into(),
-                            )
-                            .into(),
-                        material: material_red.clone(),
-                        transform: Transform::from_translation(Vec3::Z),
-                        ..default()
-                    },
-                ));
+                            material: material_red.clone(),
+                            transform: Transform::from_translation(Vec3::Z),
+                            ..default()
+                        },
+                    ));
+                }
             }
         }
     }
 }
 
-fn update_player_rays(
+fn update_player_shadows(
     windows: Query<&Window>,
     mut meshes: ResMut<Assets<Mesh>>,
     player_query: Query<&Transform, (With<Player>, Changed<Transform>)>,
     mut player_rays: Query<(&mut PlayerRay, &Mesh2dHandle)>,
-    player_occluder_shadows: Query<(&PlayerOccluderShadow, &Mesh2dHandle)>,
-    mut player_occluder_shadow_barycentres: Query<
-        (&PlayerOccluderShadowBarycentre, &mut Transform),
-        Without<Player>,
-    >,
+    player_shadows: Query<&PlayerShadow>,
+    segment_shadows: Query<(&Parent, &SegmentShadow, &Mesh2dHandle, &Children)>,
+    mut shadow_barycentres: Query<(&ShadowBarycentre, &mut Transform), Without<Player>>,
 ) {
     let window = windows.get_single().unwrap();
 
@@ -303,58 +320,43 @@ fn update_player_rays(
         player_ray.end = end;
     }
 
-    for (player_occluder_shadow, shadow_mesh_handle) in player_occluder_shadows.iter() {
-        let ray_1_end = project_points_to_window_edge(
-            window.width(),
-            window.height(),
-            &player_transform.translation,
-            &player_occluder_shadow.segment.0,
-        );
-
-        let ray_2_end = project_points_to_window_edge(
-            window.width(),
-            window.height(),
-            &player_transform.translation,
-            &player_occluder_shadow.segment.1,
-        );
-
-        let v1 = player_occluder_shadow.segment.0;
-        let v2 = ray_1_end;
-        let v3 = ray_2_end;
-        let v4 = player_occluder_shadow.segment.1;
-
-        *meshes.get_mut(&shadow_mesh_handle.0).unwrap() = Quad(v1, v2, v3, v4).into();
-    }
-
-    for (player_occluder_shadow_barycenter, mut transform) in
-        player_occluder_shadow_barycentres.iter_mut()
+    for (segment_shadow_parent, segment_shadow, segment_shadow_mesh_handle, children) in
+        segment_shadows.iter()
     {
-        let ray_1_end = project_points_to_window_edge(
-            window.width(),
-            window.height(),
-            &player_transform.translation,
-            &player_occluder_shadow_barycenter.segment.0,
-        );
+        if player_shadows.contains(segment_shadow_parent.get()) {
+            let ray_1_end = project_points_to_window_edge(
+                window.width(),
+                window.height(),
+                &player_transform.translation,
+                &segment_shadow.segment.0,
+            );
 
-        let ray_2_end = project_points_to_window_edge(
-            window.width(),
-            window.height(),
-            &player_transform.translation,
-            &player_occluder_shadow_barycenter.segment.1,
-        );
+            let ray_2_end = project_points_to_window_edge(
+                window.width(),
+                window.height(),
+                &player_transform.translation,
+                &segment_shadow.segment.1,
+            );
 
-        let v1 = player_occluder_shadow_barycenter.segment.0;
-        let v2 = ray_1_end;
-        let v3 = ray_2_end;
-        let v4 = player_occluder_shadow_barycenter.segment.1;
+            let v1 = segment_shadow.segment.0;
+            let v2 = ray_1_end;
+            let v3 = ray_2_end;
+            let v4 = segment_shadow.segment.1;
 
-        transform.translation = (v1 + v2 + v3 + v4) / 4.0 + Vec3::Z;
+            *meshes.get_mut(&segment_shadow_mesh_handle.0).unwrap() = Quad(v1, v2, v3, v4).into();
+
+            for child in children {
+                let (ShadowBarycentre, mut transform) = shadow_barycentres.get_mut(*child).unwrap();
+                transform.translation = (v1 + v2 + v3 + v4) / 4.0 + Vec3::Z;
+            }
+        }
     }
 }
 
-fn remove_player_rays(
+fn remove_player_shadows(
     mut commands: Commands,
     player_rays: Query<(Entity, &PlayerRay)>,
+    player_shadows: Query<(Entity, &PlayerShadow)>,
     mut removed_occluders: RemovedComponents<Occluder>,
     mut removed_occluders_set: Local<HashSet<Entity>>,
 ) {
@@ -366,18 +368,34 @@ fn remove_player_rays(
             commands.entity(entity).despawn_recursive();
         }
     }
+
+    for (entity, player_shadow) in player_shadows.iter() {
+        if removed_occluders_set.contains(&player_shadow.occluder) {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub struct LightSet;
 
 pub struct LightPlugin;
 
 impl Plugin for LightPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(add_player_rays)
-            .add_system(update_player_rays.after(MovementSet).run_if(
-                |player_query: Query<Entity, (Changed<Transform>, With<Player>)>| {
-                    !player_query.is_empty()
-                },
-            ))
-            .add_system(remove_player_rays.in_base_set(CoreSet::PostUpdate));
+        app.configure_set(LightSet.after(MovementSet));
+
+        app.add_system(
+            add_player_shadows
+                .in_set(LightSet)
+                .after(update_player_shadows),
+        )
+        .add_system(update_player_shadows.in_set(LightSet).run_if(
+            |player_query: Query<Entity, (Changed<Transform>, With<Player>)>| {
+                !player_query.is_empty()
+            },
+        ));
+
+        app.add_system(remove_player_shadows.in_base_set(CoreSet::PostUpdate));
     }
 }

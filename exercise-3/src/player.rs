@@ -1,29 +1,51 @@
 use bevy::prelude::*;
 
 use crate::{
-    movement::MovementSet,
+    controls::Controlled,
+    light::LightSet,
+    movement::{self, MovementSet, Speed},
     sight::{CheckVisibility, Sighted, Visible},
 };
 
 #[derive(Component)]
 pub struct Player;
 
-fn setup(mut commands: Commands) {
-    commands
-        .spawn(SpriteBundle {
-            sprite: Sprite {
-                color: Color::BLUE,
-                custom_size: Some(Vec2 { x: 10.0, y: 10.0 }),
+#[derive(Bundle)]
+pub struct PlayerBundle {
+    player: Player,
+    sprite_bundle: SpriteBundle,
+    speed: Speed,
+    direction: movement::Direction,
+    controlled: Controlled,
+    sighted: Sighted,
+    visible: Visible,
+}
+
+impl PlayerBundle {
+    pub fn new() -> Self {
+        Self {
+            player: Player,
+            sprite_bundle: SpriteBundle {
+                sprite: Sprite {
+                    color: Color::BLUE,
+                    custom_size: Some(Vec2 { x: 10.0, y: 10.0 }),
+                    ..default()
+                },
                 ..default()
             },
-            ..default()
-        })
-        .insert(crate::movement::Speed { value: 100.0 })
-        .insert(crate::movement::Direction { value: Vec2::ZERO })
-        .insert(crate::controls::Controlled)
-        .insert(Player)
-        .insert(Sighted)
-        .insert(Visible);
+            speed: Speed { value: 100.0 },
+            direction: movement::Direction { value: Vec2::ZERO },
+            controlled: Controlled,
+            sighted: Sighted,
+            visible: Visible,
+        }
+    }
+}
+
+impl Default for PlayerBundle {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 fn object_visibility(
@@ -45,12 +67,15 @@ fn object_visibility(
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub struct PlayerSet;
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup);
+        app.configure_set(PlayerSet.after(MovementSet).after(LightSet));
 
-        app.add_system(object_visibility.after(MovementSet));
+        app.add_system(object_visibility.in_set(PlayerSet));
     }
 }
