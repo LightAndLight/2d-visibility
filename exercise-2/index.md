@@ -1,5 +1,12 @@
 # Exercise 2
 
+<div align="center">
+
+<!-- ../videos/exercise_2 -->
+[exercise_2.webm](https://github.com/LightAndLight/boxybox/assets/2536121/361a4215-707f-43b0-acf6-57c931f4b43a)
+
+</div>
+
 Skip rendering of structures that aren't visible to the player.
 
 Builds on [exercise 1](../exercise-1/index.md).
