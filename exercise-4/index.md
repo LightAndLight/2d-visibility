@@ -1,5 +1,12 @@
 # Exercise 4
 
+<div align="center">
+
+<!-- ../videos/exercise_4.webm -->
+[exercise_4.webm](https://github.com/LightAndLight/boxybox/assets/2536121/20cb88d8-44de-48a6-b98f-4616c718883c)
+
+</div>
+
 Hide entities that are in shadow.
 
 Builds on [exercise 3](../exercise-3/index.md).
