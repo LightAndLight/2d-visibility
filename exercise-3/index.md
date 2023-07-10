@@ -1,5 +1,12 @@
 # Exercise 3
 
+<div align="center">
+
+<!-- ../videos/exercise_3.webm -->
+[exercise_3.webm](https://github.com/LightAndLight/boxybox/assets/2536121/f8f61d78-db72-4938-b1c7-6ad6950da581)
+
+</div>
+
 Apply "lighting" to areas that are visible to the player character.
 
 Builds on [exercise 2](../exercise-2/index.md).
