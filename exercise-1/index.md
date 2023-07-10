@@ -1,6 +1,11 @@
 # Exercise 1
 
-https://github.com/LightAndLight/boxybox/blob/main/videos/exercise_1.webm
+<div align="center">
+
+<!-- ../videos/exercise_1.webm -->
+[exercise_1.webm](https://github.com/LightAndLight/boxybox/assets/2536121/0027dcbf-522f-4b0f-8709-e64fdd587106)
+
+</div>
 
 Symmetric visibility test with occlusion via line segment intersections.
 
