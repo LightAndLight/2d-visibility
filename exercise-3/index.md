@@ -3,7 +3,7 @@
 <div align="center">
 
 <!-- ../videos/exercise_3.webm -->
-[exercise_3.webm](https://github.com/LightAndLight/boxybox/assets/2536121/f8f61d78-db72-4938-b1c7-6ad6950da581)
+[exercise_3.webm](https://github.com/LightAndLight/2d-visibility/assets/2536121/89c027b9-884b-4d48-9034-956d4137c790)
 
 </div>
 

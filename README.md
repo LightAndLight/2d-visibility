@@ -3,12 +3,11 @@
 Playing with visibility techniques for 2D games.
 
 * [`exercise-1/`](./exercise-1/index.md) - line of sight
-
   
   <div align="center">
 
   <!-- ./videos/exercise_1.webm -->
-  [exercise_1.webm](https://github.com/LightAndLight/boxybox/assets/2536121/50d39e94-869d-491f-9d08-ffb9fcd5f04f)
+  [exercise_1.webm](https://github.com/LightAndLight/2d-visibility/assets/2536121/4b003dac-0ee1-424b-869e-c20ca45d25f2)
 
   </div>
 
@@ -17,7 +16,7 @@ Playing with visibility techniques for 2D games.
   <div align="center">
 
   <!-- ./videos/exercise_2 -->
-  [exercise_2.webm](https://github.com/LightAndLight/boxybox/assets/2536121/361a4215-707f-43b0-acf6-57c931f4b43a)
+  [exercise_2.webm](https://github.com/LightAndLight/2d-visibility/assets/2536121/267680fd-f721-4bce-ac8a-669f5bd7e144)
 
   </div>
 
@@ -26,7 +25,7 @@ Playing with visibility techniques for 2D games.
   <div align="center">
 
   <!-- ./videos/exercise_3.webm -->
-  [exercise_3.webm](https://github.com/LightAndLight/boxybox/assets/2536121/f8f61d78-db72-4938-b1c7-6ad6950da581)
+  [exercise_3.webm](https://github.com/LightAndLight/2d-visibility/assets/2536121/89c027b9-884b-4d48-9034-956d4137c790)
 
   </div>
 
@@ -35,6 +34,6 @@ Playing with visibility techniques for 2D games.
   <div align="center">
 
   <!-- ./videos/exercise_4.webm -->
-  [exercise_4.webm](https://github.com/LightAndLight/boxybox/assets/2536121/20cb88d8-44de-48a6-b98f-4616c718883c)
+  [exercise_4.webm](https://github.com/LightAndLight/2d-visibility/assets/2536121/ef258774-0bd8-4c9d-aacf-db3daa40f26e)
 
   </div>
