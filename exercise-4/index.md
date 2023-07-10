@@ -12,7 +12,7 @@ Uses the "shadow map" to calculate whether an entity is visible to the player ch
   [exercise 3](../exercise-3/index.md))
 
   I tried to fix this with Z-ordering: putting the shadows on a higher "layer" than all the things
-  that shadows can occlude, but resulted in the shadows *also* occluding the entities that create
+  that shadows can occlude, but lead to the shadows *also* occluding the entities that create
   them.
   This is because I cast shadows from all sides of the occluder, including sides close to the
   player character.
@@ -21,6 +21,17 @@ Uses the "shadow map" to calculate whether an entity is visible to the player ch
   For the Z-order trick to work, only the sides that lead to "outward emanating" shadows should
   generate shadow objects.
   This would also be a performance improvement, because each occluder would generate fewer shadows.
+
+* Equates "point is lit" with "point is in player character's line of sight".
+
+  This system behaves as if there is a single light source in the same position as the player
+  character.
+  When this is the case, whether or not a point is lit corresponds to whether it's in the player's
+  line of sight.
+  This doesn't hold for static light sources.
+  A static light source illuminates its surroundings regardless of what the player character can
+  see.
+  The player character's line of sight determines which points/entities should be rendered.
 
 ## References
 

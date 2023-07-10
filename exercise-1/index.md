@@ -1,5 +1,7 @@
 # Exercise 1
 
+https://github.com/LightAndLight/boxybox/blob/main/videos/exercise_1.webm
+
 Symmetric visibility test with occlusion via line segment intersections.
 
 There is a player (a blue square), an occluding wall (a black quadrilateral), and a non-player
